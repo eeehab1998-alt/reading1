@@ -24,7 +24,8 @@ body { background: var(--bg-primary); color: var(--text-main); overflow-x: hidde
 .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(59, 130, 246, 0.1); box-shadow: 0 4px 20px rgba(30, 58, 138, 0.05); }
 .blue-text { color: var(--blue-primary); }
 .btn-primary { background: linear-gradient(135deg, var(--blue-primary) 0%, var(--blue-accent) 100%); color: #fff; font-weight: 700; transition: all 0.3s; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(37, 99, 235, 0.4); }
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(37, 99, 235, 0.4); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-outline { background: transparent; border: 1px solid var(--blue-primary); color: var(--blue-primary); font-weight: 700; transition: all 0.3s; }
 .btn-outline:hover { background: var(--blue-primary); color: #fff; transform: translateY(-2px); }
 @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
@@ -59,6 +60,10 @@ html { scroll-behavior: smooth; }
 .cert-card { background: linear-gradient(135deg, #fff 0%, #eff6ff 100%); border: 4px double var(--blue-primary); padding: 40px; text-align: center; max-width: 500px; position: relative; animation: popIn 0.5s; }
 @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 .cert-seal { width: 80px; height: 80px; background: var(--tree-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 2rem; box-shadow: 0 0 20px rgba(234, 179, 8, 0.5); }
+
+/* بطاقات الطلاب في سجل القراءات */
+.student-folder-card { transition: all 0.25s ease; cursor: pointer; }
+.student-folder-card:hover { transform: translateY(-4px); border-color: var(--blue-primary); box-shadow: 0 10px 25px rgba(37, 99, 235, 0.12); }
 </style>
 </head>
 <body>
@@ -75,7 +80,6 @@ html { scroll-behavior: smooth; }
       <a href="#home" class="text-slate-600 hover:text-blue-600">الرئيسية</a><a href="#stages" class="text-slate-600 hover:text-blue-600">المراحل</a><a href="#rules" class="text-slate-600 hover:text-blue-600">شروط المسابقة</a><a href="#stats" class="text-slate-600 hover:text-blue-600">الإحصائيات</a>
     </div>
     <div class="flex gap-2">
-      <!-- زر موقع التربية (ضع الرابط لاحقاً في خاصية href) -->
       <a href="#" id="eduMinistryLink" target="_blank" class="btn-outline px-4 py-2 rounded-lg flex items-center gap-2 text-sm hidden sm:flex">
         <i class="fas fa-external-link-alt"></i><span>موقع التربية</span>
       </a>
@@ -108,8 +112,8 @@ html { scroll-behavior: smooth; }
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
         <div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold blue-text">50</div><div class="text-xs text-slate-500 mt-1">تأشيرة لكل طالب</div></div>
         <div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold blue-text">3</div><div class="text-xs text-slate-500 mt-1">مراحل دراسية</div></div>
-        <div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold blue-text" id="totalBooksStat">0</div><div class="text-xs text-slate-500 mt-1">كتاب مقروء</div></div>
-        <div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold blue-text" id="totalPagesStat">0</div><div class="text-xs text-slate-500 mt-1">صفحة مقروءة</div></div>
+        <div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold blue-text" id="totalBooksStat">...</div><div class="text-xs text-slate-500 mt-1">كتاب مقروء</div></div>
+        <div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold blue-text" id="totalPagesStat">...</div><div class="text-xs text-slate-500 mt-1">صفحة مقروءة</div></div>
       </div>
     </div>
   </div>
@@ -153,10 +157,10 @@ html { scroll-behavior: smooth; }
   <div class="container mx-auto px-6">
     <div class="text-center mb-12"><span class="category-pill px-4 py-1.5 rounded-full text-sm"><i class="fas fa-chart-line ml-2"></i>التحليلات</span><h2 class="font-display font-bold text-4xl md:text-5xl mt-4 mb-3 blue-text">إحصائيات المدرسة</h2></div>
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-      <div class="glass-card rounded-2xl p-6 text-center"><i class="fas fa-users text-3xl blue-text mb-3"></i><div class="text-4xl font-bold blue-text" id="statStudents">0</div><div class="text-sm text-slate-500 mt-2">طالب مشارك</div></div>
-      <div class="glass-card rounded-2xl p-6 text-center"><i class="fas fa-book text-3xl blue-text mb-3"></i><div class="text-4xl font-bold blue-text" id="statBooks">0</div><div class="text-sm text-slate-500 mt-2">كتاب مقروء</div></div>
-      <div class="glass-card rounded-2xl p-6 text-center"><i class="fas fa-file-alt text-3xl blue-text mb-3"></i><div class="text-4xl font-bold blue-text" id="statPages">0</div><div class="text-sm text-slate-500 mt-2">صفحة مقروءة</div></div>
-      <div class="glass-card rounded-2xl p-6 text-center"><i class="fas fa-medal text-3xl blue-text mb-3"></i><div class="text-4xl font-bold blue-text" id="statCompleted">0</div><div class="text-sm text-slate-500 mt-2">طالب أكمل التحدي</div></div>
+      <div class="glass-card rounded-2xl p-6 text-center"><i class="fas fa-users text-3xl blue-text mb-3"></i><div class="text-4xl font-bold blue-text" id="statStudents">...</div><div class="text-sm text-slate-500 mt-2">طالب مشارك</div></div>
+      <div class="glass-card rounded-2xl p-6 text-center"><i class="fas fa-book text-3xl blue-text mb-3"></i><div class="text-4xl font-bold blue-text" id="statBooks">...</div><div class="text-sm text-slate-500 mt-2">كتاب مقروء</div></div>
+      <div class="glass-card rounded-2xl p-6 text-center"><i class="fas fa-file-alt text-3xl blue-text mb-3"></i><div class="text-4xl font-bold blue-text" id="statPages">...</div><div class="text-sm text-slate-500 mt-2">صفحة مقروءة</div></div>
+      <div class="glass-card rounded-2xl p-6 text-center"><i class="fas fa-medal text-3xl blue-text mb-3"></i><div class="text-4xl font-bold blue-text" id="statCompleted">...</div><div class="text-sm text-slate-500 mt-2">طالب أكمل التحدي</div></div>
     </div>
   </div>
 </section>
@@ -183,7 +187,7 @@ html { scroll-behavior: smooth; }
         <div class="grid grid-cols-2 gap-4"><div><label class="block text-sm text-slate-600 mb-2">الصف *</label><select id="regGrade" required class="input-field w-full px-4 py-3 rounded-lg"><option value="1">الصف 1</option><option value="2">الصف 2</option><option value="3">الصف 3</option><option value="4">الصف 4</option><option value="5">الصف 5</option><option value="6">الصف 6</option><option value="7">الصف 7</option><option value="8">الصف 8</option><option value="9">الصف 9</option></select></div><div><label class="block text-sm text-slate-600 mb-2">الشعبة</label><input type="text" id="regClass" class="input-field w-full px-4 py-3 rounded-lg" placeholder="أ/ب/ج"></div></div>
         <div><label class="block text-sm text-slate-600 mb-2">كلمة السر *</label><input type="password" id="regPassword" required class="input-field w-full px-4 py-3 rounded-lg" placeholder="اختر كلمة سر يسهل تذكرها"></div>
         <div id="registerError" class="hidden text-red-600 text-sm text-center bg-red-50 border border-red-200 rounded-lg py-2"></div>
-        <button type="submit" class="btn-primary w-full py-3 rounded-lg flex items-center justify-center gap-2"><i class="fas fa-user-check"></i> إنشاء الحساب</button>
+        <button type="submit" id="regSubmitBtn" class="btn-primary w-full py-3 rounded-lg flex items-center justify-center gap-2"><i class="fas fa-user-check"></i> إنشاء الحساب</button>
         <div class="text-center text-sm text-slate-500"><button type="button" onclick="switchAuthView('login')" class="blue-text font-bold hover:underline">العودة لتسجيل الدخول</button></div>
       </form>
     </div>
@@ -249,7 +253,7 @@ html { scroll-behavior: smooth; }
       </div>
 
       <div id="stuBookValidationMsg" class="hidden text-sm rounded-lg p-3"></div>
-      <button type="submit" class="btn-primary w-full py-3 rounded-lg flex items-center justify-center gap-2"><i class="fas fa-save"></i> حفظ الكتاب</button>
+      <button type="submit" id="saveBookBtn" class="btn-primary w-full py-3 rounded-lg flex items-center justify-center gap-2"><i class="fas fa-save"></i> حفظ الكتاب</button>
     </form></div></div>
 
     <!-- كتبي -->
@@ -271,7 +275,7 @@ html { scroll-behavior: smooth; }
 
 <!-- ====== لوحة المعلم ====== -->
 <div id="teacherDashboard" class="fixed inset-0 z-[100] hidden overflow-y-auto bg-slate-50">
-  <div class="bg-white border-b border-blue-100 sticky top-0 z-10 shadow-sm"><div class="container mx-auto px-6 py-3 flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center"><i class="fas fa-chalkboard-teacher text-white"></i></div><div><h2 class="font-display font-bold blue-text">لوحة تحكم المعلم</h2><p class="text-xs text-slate-500" id="teacherNameDisplay">المعلم</p></div></div><div class="flex items-center gap-3"><button onclick="logout()" class="btn-primary px-4 py-2 rounded-lg text-sm flex items-center gap-2"><i class="fas fa-sign-out-alt"></i><span class="hidden sm:inline">خروج</span></button></div></div></div>
+  <div class="bg-white border-b border-blue-100 sticky top-0 z-10 shadow-sm"><div class="container mx-auto px-6 py-3 flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center"><i class="fas fa-chalkboard-teacher text-white"></i></div><div><h2 class="font-display font-bold blue-text">لوحة تحكم المعلم</h2><p class="text-xs text-slate-500" id="teacherNameDisplay">المعلم</p></div></div><div class="flex items-center gap-3"><button onclick="refreshAllData()" class="btn-outline px-3 py-2 rounded-lg text-sm flex items-center gap-2"><i class="fas fa-sync-alt"></i><span class="hidden sm:inline">تحديث</span></button><button onclick="logout()" class="btn-primary px-4 py-2 rounded-lg text-sm flex items-center gap-2"><i class="fas fa-sign-out-alt"></i><span class="hidden sm:inline">خروج</span></button></div></div></div>
   <div class="container mx-auto px-6 py-8">
     <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-200">
       <button onclick="switchTab('students')" id="tab-students" class="tab-btn active px-5 py-3 text-sm font-medium"><i class="fas fa-user-graduate ml-2"></i>الطلاب</button>
@@ -301,7 +305,81 @@ html { scroll-behavior: smooth; }
       </div>
     </div>
     
-    <div id="content-records" class="tab-content hidden"><div class="glass-card rounded-2xl p-6"><h3 class="font-display font-bold text-xl blue-text mb-4">سجل القراءات</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-slate-200 text-slate-500"><th class="py-3 px-2 text-right">الطالب</th><th class="py-3 px-2 text-right">الكتاب</th><th class="py-3 px-2 text-right">الصفحات</th><th class="py-3 px-2 text-right">الملخص الصوتي</th><th class="py-3 px-2 text-right">حذف</th></tr></thead><tbody id="recordsTableBody"></tbody></table></div></div></div>
+    <!-- قسم القراءات المنظم حسب الطالب -->
+    <div id="content-records" class="tab-content hidden">
+      <!-- عرض قائمة بطاقات الطلاب -->
+      <div id="recordsStudentsGridView" class="glass-card rounded-2xl p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h3 class="font-display font-bold text-xl blue-text">سجل قراءات الطلاب</h3>
+            <p class="text-xs text-slate-500 mt-1">اضغط على بطاقة أي طالب لعرض صفحته وتفاصيل كتبه المقروءة</p>
+          </div>
+          <div class="flex gap-2">
+            <input type="text" id="searchRecordsStudent" onkeyup="renderRecords()" class="input-field px-4 py-2 rounded-lg text-sm" placeholder="ابحث باسم الطالب...">
+          </div>
+        </div>
+        <div id="recordsStudentCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+      <!-- عرض صفحة الطالب التفصيلية عند النقر عليه -->
+      <div id="studentProfileDetailView" class="hidden space-y-6">
+        <div class="glass-card rounded-2xl p-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
+            <div class="flex items-center gap-4">
+              <button onclick="closeStudentProfileDetail()" class="btn-outline px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                <i class="fas fa-arrow-right"></i> العودة للقائمة
+              </button>
+              <div>
+                <h3 id="detailStuName" class="font-display font-bold text-2xl blue-text">اسم الطالب</h3>
+                <p id="detailStuMeta" class="text-xs text-slate-500 mt-1">الصف - الرمز</p>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <div class="bg-blue-50 px-4 py-2 rounded-xl text-center border border-blue-100">
+                <div id="detailStuBooksCount" class="font-bold text-lg blue-text">0 / 50</div>
+                <div class="text-xs text-slate-500">كتاب مقروء</div>
+              </div>
+              <div class="bg-sky-50 px-4 py-2 rounded-xl text-center border border-sky-100">
+                <div id="detailStuPagesCount" class="font-bold text-lg text-sky-600">0</div>
+                <div class="text-xs text-slate-500">صفحة مقروءة</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- شجرة إنجاز الطالب للمعلم -->
+          <div class="mb-6">
+            <h4 class="font-bold text-sm text-slate-600 mb-3 text-center">شجرة إنجاز الطالب</h4>
+            <div class="tree-container max-w-xl mx-auto">
+              <div class="tree-branch b1" id="detail-tree-b1">1 - 10 كتب <i class="fas fa-seedling mr-2"></i></div>
+              <div class="tree-branch b2" id="detail-tree-b2">11 - 20 كتاب <i class="fas fa-leaf mr-2"></i></div>
+              <div class="tree-branch b3" id="detail-tree-b3">21 - 30 كتاب <i class="fas fa-tree mr-2"></i></div>
+              <div class="tree-branch b4" id="detail-tree-b4">31 - 40 كتاب <i class="fas fa-mountain mr-2"></i></div>
+              <div class="tree-branch b5" id="detail-tree-b5">41 - 50 كتاب (الإكمال) <i class="fas fa-crown mr-2"></i></div>
+            </div>
+          </div>
+
+          <!-- جدول كتب الطالب المحدد -->
+          <h4 class="font-display font-bold text-lg blue-text mb-3">الكتب المقروءة للطالب</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 bg-slate-50">
+                  <th class="py-3 px-3 text-right">#</th>
+                  <th class="py-3 px-3 text-right">اسم الكتاب</th>
+                  <th class="py-3 px-3 text-right">المؤلف</th>
+                  <th class="py-3 px-3 text-right">الصفحات</th>
+                  <th class="py-3 px-3 text-right">المجال المعرفي</th>
+                  <th class="py-3 px-3 text-right">التاريخ</th>
+                  <th class="py-3 px-3 text-right">الملخص الصوتي</th>
+                  <th class="py-3 px-3 text-right">حذف</th>
+                </tr>
+              </thead>
+              <tbody id="detailStudentBooksBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div id="content-messages" class="tab-content hidden">
       <div class="glass-card rounded-2xl p-6 mb-6">
@@ -325,43 +403,103 @@ html { scroll-behavior: smooth; }
 <div id="toast" class="toast glass-card rounded-xl px-6 py-4 flex items-center gap-3 max-w-sm"><i id="toastIcon" class="fas fa-check-circle text-2xl"></i><div><div id="toastTitle" class="font-bold text-slate-800"></div><div id="toastMsg" class="text-sm text-slate-500"></div></div></div>
 
 <script>
-// إعدادات Supabase (تم تحديثها لحسابك الجديد)
 const SUPABASE_URL = "https://mozihucfbeyghspmfkwt.supabase.co";
 const SUPABASE_KEY = "sb_publishable_5fHIelKWST0N0lSR9NJArw_XORC8QhT";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let allStudents = [], allBooks = [], allMessages = [];
 let currentStudent = null, currentTeacher = null;
+let selectedDetailStudentId = null;
 let mediaRecorder = null, audioChunks = [];
+let isSubmitting = false;
+
+function deduplicateById(items) {
+  const map = new Map();
+  (items || []).forEach(item => {
+    if (item && item.id) map.set(item.id, item);
+  });
+  return Array.from(map.values());
+}
 
 async function init() {
   await loadData();
   await loadAnnouncement();
 }
-async function loadData() {
+
+async function loadData(retries = 2) {
   try {
     const [stRes, bkRes, msgRes] = await Promise.all([
-      sb.from('students').select('*'),
-      sb.from('books').select('*'),
-      sb.from('messages').select('*')
+      sb.from('students').select('id, name, grade, class, stage, password, created_at').order('created_at', { ascending: false }),
+      sb.from('books').select('id, studentId, title, author, pages, category, date, stage, created_at').order('created_at', { ascending: false }),
+      sb.from('messages').select('id, student_id, sender, content, created_at').order('created_at', { ascending: true })
     ]);
-    allStudents = stRes.data || [];
-    allBooks = bkRes.data || [];
+
+    if (stRes.error || bkRes.error) throw new Error(stRes.error?.message || bkRes.error?.message);
+
+    allStudents = deduplicateById(stRes.data);
+    allBooks = deduplicateById(bkRes.data);
     allMessages = msgRes.data || [];
     renderStats();
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error('Load error:', e);
+    if (retries > 0) {
+      setTimeout(() => loadData(retries - 1), 1500);
+    } else {
+      showToast('error', 'تنبيه في الاتصال', 'تعذر تحميل بعض البيانات، يرجى تحديث الصفحة');
+    }
+  }
 }
+
+async function refreshAllData() {
+  showToast('success', 'جاري التحديث', 'يتم جلب أحدث البيانات...');
+  await loadData();
+  if (currentTeacher) {
+    renderStudentsTable();
+    renderRecords();
+    if (selectedDetailStudentId) openStudentProfileDetail(selectedDetailStudentId);
+    renderTeacherMsgs();
+    populateTeacherStudentSelect();
+  }
+}
+
 async function loadAnnouncement() {
   try {
-    const { data } = await sb.from('announcements').select('*').order('created_at', { ascending: false }).limit(1);
-    if (data && data.length > 0) {
+    const { data } = await sb.from('announcements').select('content').order('created_at', { ascending: false }).limit(1);
+    if (data && data.length > 0 && data[0].content) {
       document.getElementById('announcementText').textContent = data[0].content;
       document.getElementById('announcementBanner').classList.remove('hidden');
     }
   } catch (e) { console.error(e); }
 }
 
-// أوثنتيكشن
+async function playBookAudio(bookId, btn) {
+  const container = btn.parentElement;
+  const cachedBook = allBooks.find(b => b.id === bookId);
+  if (cachedBook && cachedBook.audio_base64) {
+    container.innerHTML = `<audio controls autoplay class="h-8 w-36"><source src="${cachedBook.audio_base64}"></audio>`;
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الجلب...';
+
+  try {
+    const { data, error } = await sb.from('books').select('audio_base64').eq('id', bookId).single();
+    if (error) throw error;
+    if (data && data.audio_base64) {
+      if (cachedBook) cachedBook.audio_base64 = data.audio_base64;
+      container.innerHTML = `<audio controls autoplay class="h-8 w-36"><source src="${data.audio_base64}"></audio>`;
+    } else {
+      container.innerHTML = '<span class="text-slate-400 text-xs">لا يوجد تسجيل</span>';
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-play"></i> إعادة المحاولة';
+    showToast('error', 'خطأ', 'تعذر تحميل الملف الصوتي');
+  }
+}
+
+// نوافذ تسجيل الدخول والتسجيل
 function openLoginModal() { document.getElementById('loginModal').classList.remove('hidden'); document.getElementById('loginModal').classList.add('flex'); }
 function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); document.getElementById('loginModal').classList.remove('flex'); }
 function switchAuthView(v) { document.getElementById('loginView').classList.toggle('hidden', v==='register'); document.getElementById('registerView').classList.toggle('hidden', v==='login'); }
@@ -369,39 +507,94 @@ function switchLoginRole(r) { document.getElementById('tab-student').classList.t
 
 async function handleRegister(e) {
   e.preventDefault();
-  const name = document.getElementById('regName').value.trim();
+  if (isSubmitting) return;
+  
+  const name = document.getElementById('regName').value.trim().replace(/\s+/g, ' ');
   const grade = parseInt(document.getElementById('regGrade').value);
+  const stuClass = document.getElementById('regClass').value.trim() || '-';
   const password = document.getElementById('regPassword').value.trim();
+  const errBox = document.getElementById('registerError');
+  const submitBtn = document.getElementById('regSubmitBtn');
+
   if (!name || !password) return;
+
+  const duplicate = allStudents.find(s => s.name.trim().replace(/\s+/g, ' ') === name && Number(s.grade) === grade);
+  if (duplicate) {
+    errBox.textContent = `هذا الطالب مسجل مسبقاً! رمز الدخول الخاص به هو: ${duplicate.id}`;
+    errBox.classList.remove('hidden');
+    return;
+  }
+
+  errBox.classList.add('hidden');
+  isSubmitting = true;
+  submitBtn.disabled = true;
+
   const stage = grade <= 3 ? 'national' : grade <= 6 ? 'arab1' : 'arab2';
   const id = 'rw' + Math.floor(1000 + Math.random() * 9000);
-  const newStu = { id, name, grade, class: '-', stage, password };
+  const newStu = { id, name, grade, class: stuClass, stage, password };
+
   try {
-    await sb.from('students').insert([newStu]);
-    allStudents.push(newStu);
-    closeLoginModal(); currentStudent = newStu; openStudentDashboard();
-    showToast('success', 'تم إنشاء الحساب', `رمزك: ${id}`);
-  } catch (e) { showToast('error', 'خطأ', e.message); }
+    const { error } = await sb.from('students').insert([newStu]);
+    if (error) throw error;
+    allStudents = deduplicateById([newStu, ...allStudents]);
+    renderStats();
+    closeLoginModal();
+    currentStudent = newStu;
+    openStudentDashboard();
+    showToast('success', 'تم إنشاء الحساب', `احفظ رمز دخولك: ${id}`);
+  } catch (err) {
+    showToast('error', 'خطأ في التسجيل', err.message);
+  } finally {
+    isSubmitting = false;
+    submitBtn.disabled = false;
+  }
 }
 
 function handleLogin(e) {
   e.preventDefault();
   const role = document.getElementById('tab-student').classList.contains('active') ? 'student' : 'teacher';
+  const errBox = document.getElementById('loginError');
+  errBox.classList.add('hidden');
+
   if (role === 'teacher') {
     const u = document.getElementById('loginUsername').value.trim();
     const p = document.getElementById('loginPassword').value;
-    if (u === 'admin1' && p === 'admin123') { currentTeacher = {name:'المشرف العام'}; closeLoginModal(); openTeacherDashboard(); }
-    else { document.getElementById('loginError').textContent = 'بيانات خاطئة'; document.getElementById('loginError').classList.remove('hidden'); }
+    if (u === 'admin1' && p === 'admin123') {
+      currentTeacher = { name: 'المشرف العام' };
+      closeLoginModal();
+      openTeacherDashboard();
+    } else {
+      errBox.textContent = 'اسم المستخدم أو كلمة السر غير صحيحة';
+      errBox.classList.remove('hidden');
+    }
   } else {
     const sid = document.getElementById('loginStudentId').value.trim();
     const pass = document.getElementById('loginStudentPass').value;
     const s = allStudents.find(x => x.id === sid && x.password === pass);
-    if (s) { currentStudent = s; closeLoginModal(); openStudentDashboard(); } 
-    else { document.getElementById('loginError').textContent = 'بيانات خاطئة'; document.getElementById('loginError').classList.remove('hidden'); }
+    if (s) {
+      currentStudent = s;
+      closeLoginModal();
+      openStudentDashboard();
+    } else {
+      errBox.textContent = 'رمز الطالب أو كلمة السر غير صحيحة';
+      errBox.classList.remove('hidden');
+    }
   }
 }
-function logout() { currentTeacher = null; currentStudent = null; document.getElementById('teacherDashboard').classList.add('hidden'); document.getElementById('studentDashboard').classList.add('hidden'); }
-function togglePassword(i, b) { const x = document.getElementById(i); x.type = x.type === 'password' ? 'text' : 'password'; b.innerHTML = x.type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>'; }
+
+function logout() {
+  currentTeacher = null;
+  currentStudent = null;
+  selectedDetailStudentId = null;
+  document.getElementById('teacherDashboard').classList.add('hidden');
+  document.getElementById('studentDashboard').classList.add('hidden');
+}
+
+function togglePassword(i, b) {
+  const x = document.getElementById(i);
+  x.type = x.type === 'password' ? 'text' : 'password';
+  b.innerHTML = x.type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+}
 
 // لوحة الطالب
 function openStudentDashboard() {
@@ -412,26 +605,30 @@ function openStudentDashboard() {
   renderStudentMessages();
   switchStudentTab('addBook');
 }
+
 function switchStudentTab(t) {
   document.querySelectorAll('#studentDashboard .tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('stu-tab-'+t).classList.add('active');
   document.querySelectorAll('#studentDashboard .tab-content').forEach(c => c.classList.add('hidden'));
   document.getElementById('stu-content-'+t).classList.remove('hidden');
 }
+
 function renderStudentTree() {
-  const count = allBooks.filter(b => b.studentId === currentStudent.id).length;
+  const myBooks = allBooks.filter(b => b.studentId === currentStudent.id);
+  const count = myBooks.length;
   document.getElementById('studentBooksCount').textContent = `${count} / 50`;
-  document.getElementById('studentPagesCount').textContent = allBooks.filter(b => b.studentId === currentStudent.id).reduce((s,b)=>s+b.pages,0);
-  for(let i=1; i<=5; i++) {
-    document.getElementById(`tree-b${i}`).classList.toggle('active', count >= (i-1)*10 + 1);
+  document.getElementById('studentPagesCount').textContent = myBooks.reduce((s, b) => s + (Number(b.pages) || 0), 0);
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById(`tree-b${i}`).classList.toggle('active', count >= (i - 1) * 10 + 1);
   }
 }
+
 function renderStudentBooks() {
   const tbody = document.getElementById('studentBooksTableBody');
   const books = allBooks.filter(b => b.studentId === currentStudent.id);
-  tbody.innerHTML = books.length === 0 ? '<tr><td colspan="5" class="text-center py-8 text-slate-400">لا يوجد كتب بعد.</td></tr>' : '';
+  tbody.innerHTML = books.length === 0 ? '<tr><td colspan="5" class="text-center py-8 text-slate-400">لا يوجد كتب مسجلة بعد.</td></tr>' : '';
   books.forEach(b => {
-    const audioHtml = b.audio_base64 ? `<audio controls class="h-8 w-32"><source src="${b.audio_base64}"></audio>` : '<span class="text-slate-400 text-xs">لا يوجد</span>';
+    const audioHtml = `<button onclick="playBookAudio('${b.id}', this)" class="btn-outline px-3 py-1 rounded text-xs flex items-center gap-1"><i class="fas fa-play"></i> استماع للملخص</button>`;
     tbody.innerHTML += `<tr class="border-b border-slate-100"><td class="py-3 px-2 font-medium">${b.title}</td><td class="py-3 px-2 blue-text font-bold">${b.pages}</td><td class="py-3 px-2"><span class="category-pill px-2 py-1 rounded text-xs">${b.category}</span></td><td class="py-3 px-2">${audioHtml}</td><td class="py-3 px-2"><button onclick="deleteBook('${b.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
   });
 }
@@ -465,7 +662,6 @@ document.getElementById('recordBtn').addEventListener('click', async () => {
   }
 });
 
-// ملف الصوت المرفوع
 document.getElementById('stuBookAudio').addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) {
@@ -482,35 +678,65 @@ document.getElementById('stuBookAudio').addEventListener('change', (e) => {
 // إضافة كتاب
 async function handleStudentAddBook(e) {
   e.preventDefault();
+  if (isSubmitting) return;
+
   const title = document.getElementById('stuBookTitle').value.trim();
+  const author = document.getElementById('stuBookAuthor').value.trim() || '-';
   const pages = parseInt(document.getElementById('stuBookPages').value);
   const category = document.getElementById('stuBookCategory').value;
   const audioB64 = document.getElementById('stuBookAudio').dataset.base64 || null;
-  
-  const book = { id: 'bk'+Date.now(), studentId: currentStudent.id, title, author: '-', pages, category, date: new Date().toISOString().split('T')[0], stage: currentStudent.stage, audio_base64: audioB64 };
+  const saveBtn = document.getElementById('saveBookBtn');
+
+  isSubmitting = true;
+  saveBtn.disabled = true;
+
+  const book = {
+    id: 'bk' + Date.now(),
+    studentId: currentStudent.id,
+    title,
+    author,
+    pages,
+    category,
+    date: new Date().toISOString().split('T')[0],
+    stage: currentStudent.stage,
+    audio_base64: audioB64
+  };
+
   try {
-    await sb.from('books').insert([book]);
-    allBooks.push(book);
-    
+    const { error } = await sb.from('books').insert([book]);
+    if (error) throw error;
+    allBooks = deduplicateById([book, ...allBooks]);
+
     const newCount = allBooks.filter(b => b.studentId === currentStudent.id).length;
     checkMilestones(newCount);
-    
-    document.getElementById('stuBookTitle').value = ''; document.getElementById('stuBookPages').value = ''; document.getElementById('stuBookCategory').value = '';
+
+    document.getElementById('stuBookTitle').value = '';
+    document.getElementById('stuBookAuthor').value = '';
+    document.getElementById('stuBookPages').value = '';
+    document.getElementById('stuBookCategory').value = '';
+    document.getElementById('stuBookAudio').value = '';
     document.getElementById('stuBookAudio').dataset.base64 = '';
     document.getElementById('audioPreview').classList.add('hidden');
-    showToast('success', 'تم الحفظ', `تم تسجيل كتاب "${title}"`);
-    renderStudentTree(); renderStudentBooks(); renderStats();
-  } catch (e) { showToast('error', 'خطأ', e.message); }
+
+    showToast('success', 'تم الحفظ', `تم تسجيل كتاب "${title}" بنجاح`);
+    renderStudentTree();
+    renderStudentBooks();
+    renderStats();
+  } catch (err) {
+    showToast('error', 'خطأ في الحفظ', err.message);
+  } finally {
+    isSubmitting = false;
+    saveBtn.disabled = false;
+  }
 }
 
-// شهادات التعزيز
 function checkMilestones(count) {
   if ([2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50].includes(count)) {
     let reason = "بداية موفقة وحب للقراءة!";
     if (count >= 50) reason = "لإكمال التحدي بالكامل وتحقيق 50 تأشيرة! أنت بطل القراءة.";
     else if (count >= 10) reason = `لوصولك إلى ${count} كتاب! استمر في التألق.`;
     else if (count >= 5) reason = "لقراءة 5 كتب، أنت في الطريق الصحيح.";
-    
+
     document.getElementById('certStudentName').textContent = currentStudent.name;
     document.getElementById('certReason').textContent = reason;
     document.getElementById('certificateModal').style.display = 'flex';
@@ -524,12 +750,14 @@ async function sendStudentMsg() {
   if (!txt) return;
   try {
     const msg = { student_id: currentStudent.id, sender: 'student', content: txt };
-    await sb.from('messages').insert([msg]);
+    const { error } = await sb.from('messages').insert([msg]);
+    if (error) throw error;
     allMessages.push(msg);
     document.getElementById('stuMsgInput').value = '';
     renderStudentMessages();
   } catch (e) { showToast('error', 'خطأ', e.message); }
 }
+
 function renderStudentMessages() {
   const list = document.getElementById('stuMsgList');
   const msgs = allMessages.filter(m => m.student_id === currentStudent.id);
@@ -544,27 +772,40 @@ function renderStudentMessages() {
 // لوحة المعلم
 function openTeacherDashboard() {
   document.getElementById('teacherDashboard').classList.remove('hidden');
-  renderStudentsTable(); renderRecords(); renderTeacherMsgs();
-  populateTeacherStudentSelect(); 
+  renderStudentsTable();
+  renderRecords();
+  renderTeacherMsgs();
+  populateTeacherStudentSelect();
   switchTab('students');
 }
+
 function switchTab(t) {
   document.querySelectorAll('#teacherDashboard .tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-'+t).classList.add('active');
   document.querySelectorAll('#teacherDashboard .tab-content').forEach(c => c.classList.add('hidden'));
   document.getElementById('content-'+t).classList.remove('hidden');
+  if (t === 'records') {
+    closeStudentProfileDetail();
+    renderRecords();
+  }
 }
+
 function renderStudentsTable() {
   const tbody = document.getElementById('studentsTableBody');
   const filterStage = document.getElementById('filterStudentStage')?.value || 'all';
   const sortBy = document.getElementById('sortStudentsBy')?.value || 'default';
-  
-  let displayStudents = [...allStudents];
+
+  let displayStudents = deduplicateById(allStudents);
   if (filterStage !== 'all') displayStudents = displayStudents.filter(s => s.stage === filterStage);
-  
+
   let studentsWithStats = displayStudents.map(s => {
     const books = allBooks.filter(b => b.studentId === s.id);
-    return { ...s, bookCount: books.length, totalPages: books.reduce((sum, b) => sum + b.pages, 0), progress: Math.min(100, (books.length / 50) * 100) };
+    return {
+      ...s,
+      bookCount: books.length,
+      totalPages: books.reduce((sum, b) => sum + (Number(b.pages) || 0), 0),
+      progress: Math.min(100, (books.length / 50) * 100)
+    };
   });
 
   if (sortBy === 'books_desc') studentsWithStats.sort((a, b) => b.bookCount - a.bookCount || b.totalPages - a.totalPages);
@@ -575,81 +816,229 @@ function renderStudentsTable() {
 
   tbody.innerHTML = studentsWithStats.length === 0 ? '<tr><td colspan="6" class="text-center py-8 text-slate-400">لا يوجد طلاب</td></tr>' : '';
   studentsWithStats.forEach(s => {
-    tbody.innerHTML += `<tr class="border-b border-slate-100"><td class="py-3 px-2 font-medium">${s.name}</td><td class="py-3 px-2">${s.grade}</td><td class="py-3 px-2 blue-text font-mono text-xs">${s.id}</td><td class="py-3 px-2 text-xs">${s.password}</td><td class="py-3 px-2 blue-text font-bold">${s.bookCount}/50</td><td class="py-3 px-2"><button onclick="deleteStudent('${s.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
+    tbody.innerHTML += `<tr class="border-b border-slate-100 hover:bg-blue-50/40 transition-colors">
+      <td class="py-3 px-2 font-medium">
+        <button onclick="jumpToStudentRecord('${s.id}')" class="text-right hover:text-blue-600 hover:underline font-bold flex items-center gap-2">
+          <span>${s.name}</span>
+          <i class="fas fa-external-link-alt text-xs text-blue-400"></i>
+        </button>
+      </td>
+      <td class="py-3 px-2">${s.grade}</td>
+      <td class="py-3 px-2 blue-text font-mono text-xs">${s.id}</td>
+      <td class="py-3 px-2 text-xs">${s.password}</td>
+      <td class="py-3 px-2 blue-text font-bold">${s.bookCount}/50</td>
+      <td class="py-3 px-2"><button onclick="deleteStudent('${s.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td>
+    </tr>`;
   });
 }
+
+// الانتقال المباشر لصفحة الطالب من جدول الطلاب
+function jumpToStudentRecord(studentId) {
+  switchTab('records');
+  openStudentProfileDetail(studentId);
+}
+
+// عرض بطاقات الطلاب في تبويب القراءات
 function renderRecords() {
-  const tbody = document.getElementById('recordsTableBody');
-  tbody.innerHTML = allBooks.length === 0 ? '<tr><td colspan="5" class="text-center py-8 text-slate-400">لا يوجد كتب</td></tr>' : '';
-  allBooks.forEach(b => {
-    const s = allStudents.find(x => x.id === b.studentId);
-    const audioHtml = b.audio_base64 ? `<audio controls class="h-8 w-32"><source src="${b.audio_base64}"></audio>` : '<span class="text-slate-400 text-xs">لا يوجد</span>';
-    tbody.innerHTML += `<tr class="border-b border-slate-100"><td class="py-3 px-2 font-medium">${s ? s.name : '---'}</td><td class="py-3 px-2">${b.title}</td><td class="py-3 px-2 blue-text font-bold">${b.pages}</td><td class="py-3 px-2">${audioHtml}</td><td class="py-3 px-2"><button onclick="deleteBook('${b.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
+  const container = document.getElementById('recordsStudentCardsContainer');
+  const searchQuery = (document.getElementById('searchRecordsStudent')?.value || '').trim().toLowerCase();
+  
+  let uniqueStudents = deduplicateById(allStudents);
+  if (searchQuery) {
+    uniqueStudents = uniqueStudents.filter(s => s.name.toLowerCase().includes(searchQuery) || s.id.toLowerCase().includes(searchQuery));
+  }
+
+  // ترتيب الطلاب بحيث يظهر الأكثر قراءة في الأعلى
+  const studentsWithBooks = uniqueStudents.map(s => {
+    const stuBooks = allBooks.filter(b => b.studentId === s.id);
+    const totalPages = stuBooks.reduce((sum, b) => sum + (Number(b.pages) || 0), 0);
+    return { ...s, stuBooks, bookCount: stuBooks.length, totalPages };
+  }).sort((a, b) => b.bookCount - a.bookCount || b.totalPages - a.totalPages);
+
+  if (studentsWithBooks.length === 0) {
+    container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400">لا يوجد طلاب مطابقون للبحث</div>';
+    return;
+  }
+
+  container.innerHTML = '';
+  studentsWithBooks.forEach(s => {
+    const percent = Math.min(100, Math.round((s.bookCount / 50) * 100));
+    const stageLabel = s.stage === 'national' ? 'نقرأ ونتحرر' : s.stage === 'arab1' ? 'المرحلة الأولى' : 'المرحلة الثانية';
+    
+    container.innerHTML += `
+      <div onclick="openStudentProfileDetail('${s.id}')" class="student-folder-card bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                <i class="fas fa-user-graduate"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-800 text-base hover:text-blue-600">${s.name}</h4>
+                <span class="text-xs text-slate-500">الصف ${s.grade} • ${stageLabel}</span>
+              </div>
+            </div>
+            <span class="text-xs font-mono bg-slate-100 text-slate-600 px-2 py-1 rounded">${s.id}</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 my-3 bg-slate-50 p-3 rounded-lg text-center">
+            <div>
+              <div class="font-bold blue-text text-lg">${s.bookCount} <span class="text-xs text-slate-400">/ 50</span></div>
+              <div class="text-xs text-slate-500">كتاب مقروء</div>
+            </div>
+            <div class="border-r border-slate-200">
+              <div class="font-bold text-sky-600 text-lg">${s.totalPages}</div>
+              <div class="text-xs text-slate-500">صفحة</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs text-slate-500 mb-1">
+            <span>نسبة الإنجاز</span>
+            <span class="font-bold blue-text">${percent}%</span>
+          </div>
+          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-3">
+            <div class="bg-blue-600 h-full rounded-full transition-all" style="width: ${percent}%"></div>
+          </div>
+          <div class="text-center text-xs font-bold blue-text pt-2 border-t border-slate-100 flex items-center justify-center gap-1">
+            <span>عرض صفحة الطالب وقراءاته</span>
+            <i class="fas fa-chevron-left text-[10px]"></i>
+          </div>
+        </div>
+      </div>
+    `;
   });
 }
+
+// فتح صفحة الطالب التفصيلية للمعلم
+function openStudentProfileDetail(studentId) {
+  const student = allStudents.find(s => s.id === studentId);
+  if (!student) return;
+
+  selectedDetailStudentId = studentId;
+  document.getElementById('recordsStudentsGridView').classList.add('hidden');
+  document.getElementById('studentProfileDetailView').classList.remove('hidden');
+
+  const stuBooks = allBooks.filter(b => b.studentId === studentId);
+  const totalPages = stuBooks.reduce((sum, b) => sum + (Number(b.pages) || 0), 0);
+  const stageLabel = student.stage === 'national' ? 'نقرأ ونتحرر (1-3)' : student.stage === 'arab1' ? 'تحدي القراءة - المرحلة الأولى (4-6)' : 'تحدي القراءة - المرحلة الثانية (7-9)';
+
+  document.getElementById('detailStuName').textContent = student.name;
+  document.getElementById('detailStuMeta').textContent = `الصف: ${student.grade} | المرحلة: ${stageLabel} | رمز الدخول: ${student.id}`;
+  document.getElementById('detailStuBooksCount').textContent = `${stuBooks.length} / 50`;
+  document.getElementById('detailStuPagesCount').textContent = totalPages;
+
+  // تحديث شجرة الطالب
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById(`detail-tree-b${i}`).classList.toggle('active', stuBooks.length >= (i - 1) * 10 + 1);
+  }
+
+  // تعبئة جدول الكتب الخاص بهذا الطالب فقط
+  const tbody = document.getElementById('detailStudentBooksBody');
+  if (stuBooks.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">لم يقم هذا الطالب بتسجيل أي كتب بعد.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = '';
+  stuBooks.forEach((b, index) => {
+    const audioHtml = `<button onclick="playBookAudio('${b.id}', this)" class="btn-outline px-3 py-1 rounded text-xs flex items-center gap-1"><i class="fas fa-play"></i> استماع للصوت</button>`;
+    tbody.innerHTML += `
+      <tr class="border-b border-slate-100 hover:bg-slate-50">
+        <td class="py-3 px-3 text-slate-400 font-bold">${index + 1}</td>
+        <td class="py-3 px-3 font-bold text-slate-800">${b.title}</td>
+        <td class="py-3 px-3 text-slate-600">${b.author || '-'}</td>
+        <td class="py-3 px-3 blue-text font-bold">${b.pages}</td>
+        <td class="py-3 px-3"><span class="category-pill px-2 py-1 rounded text-xs">${b.category}</span></td>
+        <td class="py-3 px-3 text-xs text-slate-500">${b.date || '-'}</td>
+        <td class="py-3 px-3">${audioHtml}</td>
+        <td class="py-3 px-3"><button onclick="deleteBook('${b.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></td>
+      </tr>
+    `;
+  });
+}
+
+function closeStudentProfileDetail() {
+  selectedDetailStudentId = null;
+  document.getElementById('studentProfileDetailView').classList.add('hidden');
+  document.getElementById('recordsStudentsGridView').classList.remove('hidden');
+}
+
 async function deleteStudent(id) {
-  if(!confirm('حذف الطالب؟')) return;
+  if (!confirm('هل تريد حذف هذا الطالب؟')) return;
   await sb.from('students').delete().eq('id', id);
   allStudents = allStudents.filter(s => s.id !== id);
-  renderStudentsTable(); renderStats();
-}
-async function deleteBook(id) {
-  if(!confirm('حذف الكتاب؟')) return;
-  await sb.from('books').delete().eq('id', id);
-  allBooks = allBooks.filter(b => b.id !== id);
-  if(currentStudent) { renderStudentBooks(); renderStudentTree(); }
-  if(currentTeacher) { renderRecords(); }
+  renderStudentsTable();
+  renderRecords();
+  populateTeacherStudentSelect();
   renderStats();
 }
 
-// رسائل المعلم
+async function deleteBook(id) {
+  if (!confirm('هل تريد حذف هذا الكتاب؟')) return;
+  await sb.from('books').delete().eq('id', id);
+  allBooks = allBooks.filter(b => b.id !== id);
+  if (currentStudent) { renderStudentBooks(); renderStudentTree(); }
+  if (currentTeacher) {
+    renderRecords();
+    renderStudentsTable();
+    if (selectedDetailStudentId) openStudentProfileDetail(selectedDetailStudentId);
+  }
+  renderStats();
+}
+
 function populateTeacherStudentSelect() {
-    const sel = document.getElementById('newMsgStudentSelect');
-    sel.innerHTML = '<option value="">-- اختر الطالب --</option>';
-    allStudents.forEach(s => {
-        sel.innerHTML += `<option value="${s.id}">${s.name} (الصف ${s.grade})</option>`;
-    });
+  const sel = document.getElementById('newMsgStudentSelect');
+  sel.innerHTML = '<option value="">-- اختر الطالب --</option>';
+  deduplicateById(allStudents).forEach(s => {
+    sel.innerHTML += `<option value="${s.id}">${s.name} (الصف ${s.grade})</option>`;
+  });
 }
+
 async function initiateTeacherMessage() {
-    const stuId = document.getElementById('newMsgStudentSelect').value;
-    const txt = document.getElementById('newMsgContent').value.trim();
-    if (!stuId || !txt) { showToast('error', 'بيانات ناقصة', 'يرجى اختيار طالب وكتابة الرسالة'); return; }
-    try {
-        await sb.from('messages').insert([{ student_id: stuId, sender: 'teacher', content: txt }]);
-        allMessages.push({ student_id: stuId, sender: 'teacher', content: txt });
-        document.getElementById('newMsgContent').value = '';
-        renderTeacherMsgs();
-        showToast('success', 'تم الإرسال', 'تم إرسال الرسالة للطالب بنجاح');
-    } catch (e) { showToast('error', 'خطأ', e.message); }
+  const stuId = document.getElementById('newMsgStudentSelect').value;
+  const txt = document.getElementById('newMsgContent').value.trim();
+  if (!stuId || !txt) { showToast('error', 'بيانات ناقصة', 'يرجى اختيار طالب وكتابة الرسالة'); return; }
+  try {
+    const { data, error } = await sb.from('messages').insert([{ student_id: stuId, sender: 'teacher', content: txt }]).select();
+    if (error) throw error;
+    allMessages.push(data && data[0] ? data[0] : { id: Date.now(), student_id: stuId, sender: 'teacher', content: txt });
+    document.getElementById('newMsgContent').value = '';
+    renderTeacherMsgs();
+    showToast('success', 'تم الإرسال', 'تم إرسال الرسالة للطالب بنجاح');
+  } catch (e) { showToast('error', 'خطأ', e.message); }
 }
+
 function renderTeacherMsgs() {
   const list = document.getElementById('teacherMsgList');
   list.innerHTML = allMessages.length === 0 ? '<p class="text-slate-400 text-center">لا توجد رسائل</p>' : '';
-  allMessages.forEach(m => {
+  allMessages.forEach((m, idx) => {
     const s = allStudents.find(x => x.id === m.student_id);
-    const name = s ? s.name : 'طالب محذوف';
+    const name = s ? s.name : 'طالب غير معروف';
+    const msgKey = m.id || idx;
     list.innerHTML += `<div class="p-4 rounded-lg border border-slate-200 bg-slate-50">
       <div class="flex justify-between"><span class="font-bold text-sm">${name}</span><span class="text-xs text-slate-400">${m.sender === 'student' ? 'رسالة من طالب' : 'ردك'}</span></div>
       <p class="text-sm text-slate-700 my-2">${m.content}</p>
-      <div class="flex gap-2 mt-2"><input type="text" id="reply-${m.id}" class="input-field text-sm px-3 py-1 rounded-lg flex-1" placeholder="اكتب رداً..."><button onclick="sendTeacherReply('${m.student_id}', '${m.id}')" class="btn-primary text-sm px-3 py-1 rounded-lg">رد</button></div>
+      <div class="flex gap-2 mt-2"><input type="text" id="reply-${msgKey}" class="input-field text-sm px-3 py-1 rounded-lg flex-1" placeholder="اكتب رداً..."><button onclick="sendTeacherReply('${m.student_id}', '${msgKey}')" class="btn-primary text-sm px-3 py-1 rounded-lg">رد</button></div>
     </div>`;
   });
 }
+
 async function sendTeacherReply(stuId, msgId) {
   const inp = document.getElementById('reply-'+msgId);
   const txt = inp.value.trim();
-  if(!txt) return;
-  await sb.from('messages').insert([{ student_id: stuId, sender: 'teacher', content: txt }]);
-  allMessages.push({ student_id: stuId, sender: 'teacher', content: txt });
+  if (!txt) return;
+  const { data } = await sb.from('messages').insert([{ student_id: stuId, sender: 'teacher', content: txt }]).select();
+  allMessages.push(data && data[0] ? data[0] : { id: Date.now(), student_id: stuId, sender: 'teacher', content: txt });
   inp.value = '';
   renderTeacherMsgs();
   showToast('success', 'تم الإرسال', 'تم إرسال الرد للطالب');
 }
 
-// الإعلانات
 async function publishAnnouncement() {
   const txt = document.getElementById('announceInput').value.trim();
-  if(!txt) return;
+  if (!txt) return;
   try {
     await sb.from('announcements').insert([{ content: txt }]);
     document.getElementById('announcementText').textContent = txt;
@@ -658,21 +1047,26 @@ async function publishAnnouncement() {
   } catch (e) { showToast('error', 'خطأ', e.message); }
 }
 
-// إحصائيات وواجهة
 function renderStats() {
-  document.getElementById('statStudents').textContent = allStudents.length;
-  document.getElementById('statBooks').textContent = allBooks.length;
-  document.getElementById('totalBooksStat').textContent = allBooks.length;
-  document.getElementById('statPages').textContent = allBooks.reduce((s,b)=>s+b.pages,0);
-  document.getElementById('totalPagesStat').textContent = allBooks.reduce((s,b)=>s+b.pages,0);
-  document.getElementById('statCompleted').textContent = allStudents.filter(s => allBooks.filter(b => b.studentId === s.id).length >= 50).length;
+  const uniqueStudents = deduplicateById(allStudents);
+  const uniqueBooks = deduplicateById(allBooks);
+  const totalPages = uniqueBooks.reduce((s, b) => s + (Number(b.pages) || 0), 0);
+
+  document.getElementById('statStudents').textContent = uniqueStudents.length;
+  document.getElementById('statBooks').textContent = uniqueBooks.length;
+  document.getElementById('totalBooksStat').textContent = uniqueBooks.length;
+  document.getElementById('statPages').textContent = totalPages;
+  document.getElementById('totalPagesStat').textContent = totalPages;
+  document.getElementById('statCompleted').textContent = uniqueStudents.filter(s => uniqueBooks.filter(b => b.studentId === s.id).length >= 50).length;
 }
+
 function showToast(type, title, msg) {
   const t = document.getElementById('toast');
   document.getElementById('toastTitle').textContent = title;
   document.getElementById('toastMsg').textContent = msg;
   document.getElementById('toastIcon').className = type === 'success' ? 'fas fa-check-circle text-2xl text-green-500' : 'fas fa-exclamation-circle text-2xl text-red-500';
-  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 init();
